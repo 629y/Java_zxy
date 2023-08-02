@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zxy.mapper.StudentInfoMapper">
+
+    <resultMap id="studentMap" type="studentInfo">
+        <id property="id" column="id"/>
+        <collection property="hobbyInfos" ofType="hobbyInfo" column="hid" select="cn.zxy.mapper.HobbyInfoMapper.select"/>
+    </resultMap>
+    <select id="select" resultMap="studentMap">
+
+        select * from student  left join student_hobby  on student.id = student_hobby.sid
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <!--批量根据id查询-->
+            <if test="ids != null">
+                and id in
+                <foreach collection="ids" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="name !=null">
+                and name like concat('%',#{name},'%')
+            </if>
+
+            <if test="gender !=null">
+                and gender = #{gender}
+            </if>
+
+            <if test="tel !=null">
+                and tel = #{tel}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insert">
+        insert into student(name,gender,birthday,hobby,tel,address,self_introduce)
+        values (#{name},#{gender},#{birthday},#{hobby},#{tel},#{address},#{self_introduce})
+    </insert>
+
+
+    <update id="update">
+        update student set name=#{name},gender=#{gender},birthday=#{birthday},
+        hobby=#{hobby},tel=#{tel},address=#{address},self_introduce=#{self_introduce} where id=#{id}
+    </update>
+
+
+    <delete id="delete">
+         delete from student where id=#{id}
+    </delete>
+</mapper>
